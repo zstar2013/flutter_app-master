@@ -1,65 +1,50 @@
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(LogoApp());
 
-class MyApp extends StatelessWidget {
-  @override
+// #docregion AnimatedLogo
+class AnimatedLogo extends AnimatedWidget {
+  AnimatedLogo({key, @required Animation<double> animation})
+      : super(key: key, listenable: animation);
+
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      initialRoute: "/",
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
+    final animation = listenable as Animation<double>;
+    return Center(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10),
+        height: animation.value,
+        width: animation.value,
+        child: FlutterLogo(),
       ),
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
+// #enddocregion AnimatedLogo
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
+class LogoApp extends StatefulWidget {
+  _LogoAppState createState() => _LogoAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
+  Animation<double> animation;
+  AnimationController controller;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    animation = Tween<double>(begin: 0, end: 300).animate(controller);
+    controller.forward();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: new Center(
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text(
-              'You have pushed the button this many times:',
-            ),
-            new Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            // ignore: deprecated_member_use
-          ],
+  Widget build(BuildContext context) => AnimatedLogo(animation: animation);
 
-        ),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
